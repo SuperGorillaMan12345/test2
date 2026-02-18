@@ -1,13 +1,3 @@
-function risk(level) {
-  if (level === "high") return "🔴 高";
-  if (level === "mid") return "🟡 中";
-  return "🟢 低";
-}
-
-function isMobile() {
-  return /Mobi|Android|iPhone/.test(navigator.userAgent);
-}
-
 async function getIP() {
   try {
     const res = await fetch("https://api.ipify.org?format=json");
@@ -17,12 +7,27 @@ async function getIP() {
   }
 }
 
+function riskBadge(level) {
+  if (level === "high") return `<span class="risk high">🔴 高</span>`;
+  if (level === "mid") return `<span class="risk mid">🟡 中</span>`;
+  return `<span class="risk low">🟢 低</span>`;
+}
+
+function row(label, value, risk) {
+  return `
+    <div class="row">
+      <div class="label">${label}</div>
+      <div class="value">${value} ${riskBadge(risk)}</div>
+    </div>
+  `;
+}
+
 function canvasFingerprint() {
   const c = document.createElement("canvas");
   const ctx = c.getContext("2d");
   ctx.font = "14px Arial";
   ctx.fillText("fingerprint-demo", 2, 2);
-  return c.toDataURL().slice(0, 32) + "…";
+  return c.toDataURL().slice(0, 24) + "…";
 }
 
 function getWebGL() {
@@ -36,34 +41,36 @@ function getWebGL() {
 
 (async () => {
   const app = document.getElementById("app");
+  if (!app) return;
+
   const ip = await getIP();
 
   app.innerHTML = `
-  <div class="section">
-    <h2>🖥 デバイス情報</h2>
-    <div class="row"><span>端末種別</span><span>${isMobile() ? "スマホ" : "PC"} ${risk("low")}</span></div>
-    <div class="row"><span>OS</span><span>Windows ${risk("low")}</span></div>
-    <div class="row"><span>ブラウザ</span><span>Edge / Chrome系 ${risk("low")}</span></div>
-    <div class="row"><span>画面サイズ</span><span>${screen.width} × ${screen.height} ${risk("low")}</span></div>
-  </div>
+    <div class="section">
+      <h2>🖥 デバイス情報</h2>
+      ${row("端末", /Mobi/.test(navigator.userAgent) ? "スマホ" : "PC", "low")}
+      ${row("OS", "Windows", "low")}
+      ${row("ブラウザ", "Edge / Chrome系", "low")}
+      ${row("画面サイズ", `${screen.width} × ${screen.height}`, "low")}
+    </div>
 
-  <div class="section">
-    <h2>🌍 設定・環境</h2>
-    <div class="row"><span>言語</span><span>${navigator.language} ${risk("low")}</span></div>
-    <div class="row"><span>タイムゾーン</span><span>日本時間 (JST) ${risk("low")}</span></div>
-    <div class="row"><span>Cookie</span><span>${navigator.cookieEnabled ? "有効" : "無効"} ${risk("mid")}</span></div>
-  </div>
+    <div class="section">
+      <h2>🌍 環境設定</h2>
+      ${row("言語", navigator.language, "low")}
+      ${row("タイムゾーン", "日本時間 (JST)", "low")}
+      ${row("Cookie", navigator.cookieEnabled ? "有効" : "無効", "mid")}
+    </div>
 
-  <div class="section">
-    <h2>📡 通信</h2>
-    <div class="row"><span>IPアドレス</span><span>${ip} ${risk("high")}</span></div>
-    <div class="row"><span>推定地域</span><span>日本（都道府県レベル） ${risk("mid")}</span></div>
-  </div>
+    <div class="section">
+      <h2>📡 通信情報</h2>
+      ${row("IPアドレス", ip, "high")}
+      ${row("推定地域", "日本（都道府県レベル）", "mid")}
+    </div>
 
-  <div class="section">
-    <h2>🧬 識別情報</h2>
-    <div class="row"><span>Canvas指紋</span><span>${canvasFingerprint()} ${risk("mid")}</span></div>
-    <div class="row"><span>GPU情報</span><span>${getWebGL()} ${risk("mid")}</span></div>
-  </div>
+    <div class="section">
+      <h2>🧬 識別情報</h2>
+      ${row("Canvas指紋", canvasFingerprint(), "mid")}
+      ${row("GPU(WebGL)", getWebGL(), "mid")}
+    </div>
   `;
 })();
