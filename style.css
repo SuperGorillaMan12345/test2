@@ -17,33 +17,23 @@ h1 {
     margin-bottom: 20px;
 }
 
-.info div {
+.row {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #2a2f3a;
     padding: 8px 0;
+    border-bottom: 1px solid #2a2f3a;
 }
 
-.info span {
+.label {
     color: #8b93a7;
+    text-align: left;
 }
 
-/* 👇 ここを左揃え */
-.info p {
-    margin: 0;
+.value {
     text-align: left;
     font-weight: bold;
 }
 
-/* 危険度カラー */
-.safe {
-    color: #4caf50;
-}
-
-.medium {
-    color: #ff9800;
-}
-
-.danger {
-    color: #f44336;
-}
+.safe { color: #4caf50; }
+.medium { color: #ff9800; }
+.danger { color: #f44336; }
