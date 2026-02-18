@@ -1,8 +1,10 @@
-(async () => {
+window.addEventListener("DOMContentLoaded", () => {
     const app = document.getElementById("app");
-    if (!app) return;
+    if (!app) {
+        console.error("app が見つからない");
+        return;
+    }
 
-    // 例の取得データ（今のやつ）
     const data = {
         userAgent: navigator.userAgent,
         platform: navigator.platform,
@@ -10,11 +12,9 @@
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         screen: `${screen.width} x ${screen.height}`,
         colorDepth: screen.colorDepth,
-        cookiesEnabled: navigator.cookieEnabled,
-        ipAddress: "取得中"
+        cookiesEnabled: navigator.cookieEnabled
     };
 
-    // 危険度（適当な例）
     let riskText = "低";
     let riskClass = "safe";
 
@@ -33,11 +33,10 @@
         <div class="row"><div class="label">画面サイズ</div><div class="value">${data.screen}</div></div>
         <div class="row"><div class="label">色深度</div><div class="value">${data.colorDepth}</div></div>
         <div class="row"><div class="label">Cookie</div><div class="value">${data.cookiesEnabled}</div></div>
-        <div class="row"><div class="label">IP</div><div class="value">${data.ipAddress}</div></div>
 
         <div class="row">
             <div class="label">危険度</div>
             <div class="value ${riskClass}">${riskText}</div>
         </div>
     `;
-})();
+});
