@@ -1,90 +1,69 @@
-function browserName() {
-  const ua = navigator.userAgent;
-  if (ua.includes("Chrome")) return "Chrome";
-  if (ua.includes("Firefox")) return "Firefox";
-  if (ua.includes("Safari")) return "Safari";
-  return "不明";
+function risk(level) {
+  if (level === "high") return "🔴 高";
+  if (level === "mid") return "🟡 中";
+  return "🟢 低";
 }
 
-function osName() {
-  const ua = navigator.userAgent;
-  if (ua.includes("Windows")) return "Windows";
-  if (ua.includes("Mac")) return "macOS";
-  if (ua.includes("Android")) return "Android";
-  if (ua.includes("iPhone")) return "iOS";
-  return "不明";
+function isMobile() {
+  return /Mobi|Android|iPhone/.test(navigator.userAgent);
 }
 
-function riskBadge(level) {
-  if (level === "high") return `<span class="risk high">🔴 高</span>`;
-  if (level === "mid") return `<span class="risk mid">🟡 中</span>`;
-  return `<span class="risk low">🟢 低</span>`;
-}
-
-function row(label, value, risk) {
-  return `
-    <div class="row">
-      <div class="label">${label}</div>
-      <div class="value">${value} ${riskBadge(risk)}</div>
-    </div>
-  `;
+async function getIP() {
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    return (await res.json()).ip;
+  } catch {
+    return "取得失敗";
+  }
 }
 
 function canvasFingerprint() {
   const c = document.createElement("canvas");
   const ctx = c.getContext("2d");
   ctx.font = "14px Arial";
-  ctx.fillText("fingerprint", 2, 2);
-  return c.toDataURL();
+  ctx.fillText("fingerprint-demo", 2, 2);
+  return c.toDataURL().slice(0, 32) + "…";
 }
 
-function getWebGLInfo() {
-  const canvas = document.createElement("canvas");
-  const gl = canvas.getContext("webgl");
+function getWebGL() {
+  const c = document.createElement("canvas");
+  const gl = c.getContext("webgl");
   if (!gl) return "無効";
   const ext = gl.getExtension("WEBGL_debug_renderer_info");
   if (!ext) return "取得不可";
   return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
 }
 
-async function getIP() {
-  try {
-    const r = await fetch("https://api.ipify.org?format=json");
-    return (await r.json()).ip;
-  } catch {
-    return "取得失敗";
-  }
-}
-
 (async () => {
   const app = document.getElementById("app");
+  const ip = await getIP();
 
   app.innerHTML = `
-    <div class="section">
-      <h2>🖥 デバイス情報</h2>
-      ${row("端末", /Mobi/.test(navigator.userAgent) ? "スマホ" : "PC", "low")}
-      ${row("OS", osName(), "low")}
-      ${row("ブラウザ", browserName(), "low")}
-      ${row("画面サイズ", `${screen.width} × ${screen.height}`, "low")}
-    </div>
+  <div class="section">
+    <h2>🖥 デバイス情報</h2>
+    <div class="row"><span>端末種別</span><span>${isMobile() ? "スマホ" : "PC"} ${risk("low")}</span></div>
+    <div class="row"><span>OS</span><span>Windows ${risk("low")}</span></div>
+    <div class="row"><span>ブラウザ</span><span>Edge / Chrome系 ${risk("low")}</span></div>
+    <div class="row"><span>画面サイズ</span><span>${screen.width} × ${screen.height} ${risk("low")}</span></div>
+  </div>
 
-    <div class="section">
-      <h2>🌍 環境設定</h2>
-      ${row("言語", navigator.language, "low")}
-      ${row("タイムゾーン", Intl.DateTimeFormat().resolvedOptions().timeZone, "low")}
-      ${row("Cookie", navigator.cookieEnabled ? "有効" : "無効", "mid")}
-    </div>
+  <div class="section">
+    <h2>🌍 設定・環境</h2>
+    <div class="row"><span>言語</span><span>${navigator.language} ${risk("low")}</span></div>
+    <div class="row"><span>タイムゾーン</span><span>日本時間 (JST) ${risk("low")}</span></div>
+    <div class="row"><span>Cookie</span><span>${navigator.cookieEnabled ? "有効" : "無効"} ${risk("mid")}</span></div>
+  </div>
 
-    <div class="section">
-      <h2>📡 通信</h2>
-      ${row("IPアドレス", await getIP(), "high")}
-      ${row("地域推定", "国・都道府県レベル", "mid")}
-    </div>
+  <div class="section">
+    <h2>📡 通信</h2>
+    <div class="row"><span>IPアドレス</span><span>${ip} ${risk("high")}</span></div>
+    <div class="row"><span>推定地域</span><span>日本（都道府県レベル） ${risk("mid")}</span></div>
+  </div>
 
-    <div class="section">
-      <h2>🧬 識別情報</h2>
-      ${row("Canvas指紋", canvasFingerprint().slice(0, 24) + "…", "mid")}
-      ${row("GPU(WebGL)", getWebGLInfo(), "mid")}
-    </div>
+  <div class="section">
+    <h2>🧬 識別情報</h2>
+    <div class="row"><span>Canvas指紋</span><span>${canvasFingerprint()} ${risk("mid")}</span></div>
+    <div class="row"><span>GPU情報</span><span>${getWebGL()} ${risk("mid")}</span></div>
+  </div>
   `;
 })();
