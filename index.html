@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>Browser Info Demo</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <title>Site Info Checker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>🔍 サイトに入っただけで取得できる情報</h1>
+<div class="container">
+    <h1>サイト情報解析</h1>
 
-  <!-- JSがここに中身を入れる -->
-  <div id="app"></div>
+    <div class="info">
+        <div><span>IPアドレス</span><p id="ip">取得中...</p></div>
+        <div><span>国</span><p id="country">取得中...</p></div>
+        <div><span>ブラウザ</span><p id="browser">取得中...</p></div>
+        <div><span>OS</span><p id="os">取得中...</p></div>
+        <div><span>言語</span><p id="language">取得中...</p></div>
+        <div><span>危険度</span><p id="risk">判定中...</p></div>
+    </div>
+</div>
 
-  <p class="notice">
-    ※ このページは教育目的のデモです。情報は保存・送信されません。
-  </p>
-
-  <!-- JS -->
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
